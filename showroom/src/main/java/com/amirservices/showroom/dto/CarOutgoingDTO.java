@@ -4,12 +4,15 @@ package com.amirservices.showroom.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 import java.util.Date;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CarOutgoingDTO {
 
     @Max(250)
@@ -35,7 +38,7 @@ public class CarOutgoingDTO {
     private String currentOwnerAddress;
 
     @PositiveOrZero
-    private Integer manufacturingDate;
+    private Integer manufacturingYear;
 
     @PastOrPresent
     private Date lastRegistrationDate;

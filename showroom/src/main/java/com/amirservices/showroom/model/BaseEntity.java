@@ -11,9 +11,6 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @MappedSuperclass
 public class BaseEntity {
 

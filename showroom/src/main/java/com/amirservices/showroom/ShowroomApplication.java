@@ -4,11 +4,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ShowroomApplicaiton {
+public class ShowroomApplication {
 
     public static void main(String[] args){
 
-        SpringApplication.run(ShowroomApplicaiton.class);
+        SpringApplication.run(ShowroomApplication.class);
 
     }
 

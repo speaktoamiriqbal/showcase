@@ -13,6 +13,9 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="manufacturing_details")
 public class ManufacturingDetail extends BaseEntity{
