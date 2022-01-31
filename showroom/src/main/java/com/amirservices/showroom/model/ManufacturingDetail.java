@@ -32,7 +32,7 @@ public class ManufacturingDetail extends BaseEntity{
     @Column(length = 4)
     private Integer makeYear;
 
-    @OneToMany(mappedBy = "manufacturingDetail", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "manufacturingDetail")
     private List<Car> cars;
 
 }

@@ -1,11 +1,7 @@
 package com.amirservices.showroom.controller;
 
 import com.amirservices.showroom.dto.CarIncomingDTO;
-import com.amirservices.showroom.dto.CarMapper;
 import com.amirservices.showroom.dto.CarOutgoingDTO;
-import com.amirservices.showroom.model.Car;
-import com.amirservices.showroom.model.ManufacturingDetail;
-import com.amirservices.showroom.model.Owner;
 import com.amirservices.showroom.service.CarService;
 import com.amirservices.showroom.util.CarConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,9 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
-import java.util.Date;
 
 
 @Slf4j
@@ -33,25 +27,24 @@ public class CarController {
     CarService carService;
 
 
-    @Operation(summary = "Creates a car ")
-    @ApiResponse(responseCode = "201", description = "Order is created",
+    @Operation(summary = "Saves a car ")
+    @ApiResponse(responseCode = "201", description = "Car is saved",
             content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CarOutgoingDTO.class))})
 
     @PostMapping(value = "/create",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarOutgoingDTO> createCar(
             @RequestBody
-                    CarIncomingDTO carIncomingDto){
+                    CarIncomingDTO carIncomingDto) throws Exception{
 
         log.info(CarConstants.CREATE_CAR_ENTRY);
-
-
-        Car car = carService.persistCar(carIncomingDto);
-        CarOutgoingDTO carOutgoingDTO = CarMapper.performEntityToDTOMapping(car);
-        // todo:   call service here
+        CarOutgoingDTO carOutgoingDTO = carService.persistCar(carIncomingDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(carOutgoingDTO);
     }
 
 
+    @Operation(summary = "Search a car by registration")
+    @ApiResponse(responseCode = "201", description = "Car is searched by registration",
+            content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CarOutgoingDTO.class))})
     @GetMapping(value = "/get/{registrationNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CarOutgoingDTO> loadCar(
             @NotEmpty
@@ -60,68 +53,38 @@ public class CarController {
 
         log.info(CarConstants.READ_CAR_ENTRY);
         CarOutgoingDTO carOutgoingDto = null;
-       try {
-
-           /* Car car = Car.builder()
-                    .registrationDate(new Date())
-                    .registrationId("LEM-1375")
-                    .owner(
-                            Owner.builder()
-                                    .fullName("Amir Iqbal")
-                                    .telephone(1234567L)
-                                    .email("ai@abc.com")
-                                    .fullAddress("my home address")
-                                    .type('P')
-                                    .build()
-                    )
-                    .manufacturingDetail(
-                            ManufacturingDetail.builder()
-                                    .brand("toyota")
-                                    .model("vitz")
-                                    .type("hatchback")
-                                    .makeYear(2022)
-                                    .build()
-                    ).build();
-
-           carOutgoingDto = CarMapper.performEntityToDTOMapping(car);*/
-           carOutgoingDto = carService.getCarByRegistrationNumber(registrationNumber);
-
-           //int d = 2/0;
-
-       }catch (Exception exp){
-           throw new Exception("message from exp", exp);
-
-       }
-
-        // todo:   call service here
+        carOutgoingDto = carService.getCarByRegistrationNumber(registrationNumber);
         return ResponseEntity.status(HttpStatus.OK).body(carOutgoingDto);
     }
 
 
+
+    @Operation(summary = "Modify an existing car ")
+    @ApiResponse(responseCode = "201", description = "Existing Car is modified",
+            content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CarOutgoingDTO.class))})
     @PutMapping(value = "/put", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CarOutgoingDTO> updateCar(
-            @Valid
+    public ResponseEntity<CarOutgoingDTO> updateCar (
             @RequestBody
-                    CarIncomingDTO carIncomingDto){
+                    CarIncomingDTO carIncomingDto) throws Exception{
 
         log.info(CarConstants.UPDATE_CAR_ENTRY);
-        CarOutgoingDTO carOutgoingDto = CarOutgoingDTO.builder().build();
-        // todo:   call service here
-        return ResponseEntity.status(HttpStatus.OK).body(carOutgoingDto);
+        CarOutgoingDTO carOutgoingDTO = carService.updateCar(carIncomingDto);
+        return ResponseEntity.status(HttpStatus.OK).body(carOutgoingDTO);
     }
 
 
-
+    @Operation(summary = "Removes a car ")
+    @ApiResponse(responseCode = "201", description = "Car is removed",
+            content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = CarOutgoingDTO.class))})
     @DeleteMapping(value = "/delete/{registrationNumber}")
     public ResponseEntity<CarOutgoingDTO> deleteCar(
             @NotEmpty
             @PathVariable (value = "registrationNumber")
-                    String carId){
+                    String carId) throws Exception{
 
         log.info(CarConstants.DELETE_CAR_ENTRY);
-        CarOutgoingDTO carOutgoingDto = CarOutgoingDTO.builder().build();
-        // todo:   call service here
-        return ResponseEntity.status(HttpStatus.OK).body(carOutgoingDto);
+        CarOutgoingDTO carOutgoingDTO = carService.removeCar(carId);
+        return ResponseEntity.status(HttpStatus.OK).body(carOutgoingDTO);
 
     }
 

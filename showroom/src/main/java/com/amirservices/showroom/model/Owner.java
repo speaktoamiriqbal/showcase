@@ -33,7 +33,7 @@ public class Owner extends BaseEntity {
     @Column
     private String fullAddress;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "owner")
     private List<Car> cars;
 
 

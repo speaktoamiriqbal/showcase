@@ -1,108 +1,86 @@
 package com.amirservices.showroom.dto;
 
+
 import com.amirservices.showroom.model.Car;
-import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.AbstractConverter;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
-
-import java.util.Calendar;
-import java.util.Date;
-
-public class CarMapper {
-
-    private static final String OWNER_TYPE_PERSON = "PERSON";
-    private static final String OWNER_TYPE_COMPANY = "COMPANY";
-
-    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
+import org.mapstruct.factory.Mappers;
 
 
-    // Converters
-    public static Converter<Character, String> ownerTypeConverter = new AbstractConverter<Character, String>() {
-        protected String convert(Character source) {
-            if(source== null)
-            return "INVALID";
+@Mapper(uses={DateMapper.class,
+        OwnerTypeMapper.class})
 
-            if(source == 'P'){
-                return OWNER_TYPE_PERSON;
-            }else if(source == 'C'){
-                return OWNER_TYPE_COMPANY;
-            }else{
-                return  "INVALID";
-            }
-        }
-    };
+public interface CarMapper {
 
+    CarMapper INSTANCE = Mappers.getMapper( CarMapper.class );
 
-    public static Converter<String, String> toUpperCaseConverter = new AbstractConverter<String, String>() {
-        protected String convert(String source) {
-            if(StringUtils.isBlank(source))
-                return source;
-
-            return source.trim().toUpperCase();
-        }
-    };
+    @BeanMapping(ignoreByDefault = true)
+    @Mappings({
+            @Mapping(source = "description", target = "description"),
+            @Mapping(source = "registrationId", target = "registrationNumber"),
+            @Mapping(source = "registrationDate", target = "lastRegistrationDate"),
+            @Mapping(source = "owner.fullName", target = "currentOwnerName"),
+            @Mapping(source = "owner.email", target = "currentOwnerEmail"),
+            @Mapping(source = "owner.telephone", target = "currentOwnerTelephone"),
+            @Mapping(source = "owner.fullAddress", target = "currentOwnerAddress"),
+            @Mapping(source = "owner.type", target = "currentOwnerType" ),
+            @Mapping(source = "manufacturingDetail.type", target = "bodyType"),
+            @Mapping(source = "manufacturingDetail.brand", target = "brand"),
+            @Mapping(source = "manufacturingDetail.model", target = "model"),
+            @Mapping(source = "manufacturingDetail.makeYear", target = "manufacturingYear")
+    })
+    CarOutgoingDTO entityToOutgoingDto(Car car);
 
 
-    public static Converter<String, String> toLowerCaseConverter = new AbstractConverter<String, String>() {
-        protected String convert(String source) {
-            if(StringUtils.isBlank(source))
-                return source;
-
-            return source.trim().toLowerCase();
-        }
-    };
-
-    public static Converter<Date, Integer> dateToYearConverter = new AbstractConverter<Date, Integer>() {
-        protected Integer convert(Date source) {
-            if(source == null)
-                return 0;
-
-            Calendar cal= Calendar.getInstance();
-            cal.setTime(source);
-            return cal.get(Calendar.YEAR);
-        }
-    };
-
-
-
-    public static final  Car performDTOtoEntityMapping(CarIncomingDTO incomingCar){
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.createTypeMap(CarIncomingDTO.class, Car.class);
-
-
-
-        Car car= modelMapper.map(incomingCar, Car.class);
-
-        return car;
-    }
-
-    public static final CarOutgoingDTO performEntityToDTOMapping(Car entityCar){
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.createTypeMap(Car.class, CarOutgoingDTO.class)
-                .addMapping(Car::getDescription, CarOutgoingDTO::setDescription)
-                .addMapping(Car::getRegistrationId, CarOutgoingDTO::setRegistrationNumber)
-                //.addMappings(mapper -> mapper.using(dateToYearConverter).map(src -> src.getRegistrationDate(), CarOutgoingDTO::setLastRegistrationDate))
-                .addMappings(mapper -> mapper.using(ownerTypeConverter).map(src -> src.getOwner().getType(), CarOutgoingDTO::setCurrentOwnerType))
-                .addMapping(src -> src.getOwner().getFullName(), CarOutgoingDTO::setCurrentOwnerName)
-                .addMapping(src -> src.getOwner().getEmail(), CarOutgoingDTO::setCurrentOwnerEmail)
-                .addMapping(src -> src.getOwner().getTelephone(), CarOutgoingDTO::setCurrentOwnerTelephone)
-                .addMapping(src -> src.getOwner().getFullAddress(), CarOutgoingDTO::setCurrentOwnerAddress)
-                .addMapping(src -> src.getManufacturingDetail().getMakeYear(), CarOutgoingDTO::setManufacturingYear)
-                .addMappings(mapper -> mapper.using(toUpperCaseConverter).map(src -> src.getManufacturingDetail().getBrand(), CarOutgoingDTO::setBrand))
-                .addMappings(mapper -> mapper.using(toUpperCaseConverter).map(src -> src.getManufacturingDetail().getModel(), CarOutgoingDTO::setModel))
-                .addMappings(mapper -> mapper.using(toUpperCaseConverter).map(src -> src.getManufacturingDetail().getType(), CarOutgoingDTO::setBodyType));
-
-
-        CarOutgoingDTO carOutgoingDTO = modelMapper.map(entityCar, CarOutgoingDTO.class);
-
-        return carOutgoingDTO;
-    }
+    @BeanMapping(ignoreByDefault = true)
+    @Mappings({
+            @Mapping(source = "description", target = "description"),
+            @Mapping(source = "registrationNumber", target = "registrationId"),
+            @Mapping(source = "lastRegistrationDate", target = "registrationDate"),
+            @Mapping(source = "currentOwnerName", target = "owner.fullName"),
+            @Mapping(source = "currentOwnerEmail", target = "owner.email"),
+            @Mapping(source = "currentOwnerTelephone", target = "owner.telephone"),
+            @Mapping(source = "currentOwnerAddress", target = "owner.fullAddress"),
+            @Mapping(source = "currentOwnerType", target = "owner.type"),
+            @Mapping(source = "bodyType", target = "manufacturingDetail.type"),
+            @Mapping(source = "brand", target = "manufacturingDetail.brand"),
+            @Mapping(source = "model", target = "manufacturingDetail.model"),
+            @Mapping(source = "manufacturingYear", target = "manufacturingDetail.makeYear")
+    })
+    Car incomingDtoToEntity(CarIncomingDTO carIncomingDTO);
 
 
 
 
 
+
+
+
+
+//@Mapping(source = "manufacturingDate", dateFormat = "dd.MM.yyyy")
+   // Car incomingDtoToEntity(CarIncomingDTO carIncomingDTO);
 
 
 }
+
+
+
+/*
+*
+* pper.createTypeMap(CarIncomingDTO.class, Car.class)
+  .addMapping(CarIncomingDTO::getDescription, Car::setDescription)
+  .addMapping(CarIncomingDTO::getRegistrationNumber, Car::setRegistrationId)
+  //.addMappings(mapper -> mapper.using(dateToYearConverter).map(src -> src.getRegistrationDate(), CarOutgoingDTO::setLastRegistrationDate))
+  .addMappings(mapper -> mapper.map(src -> src.getCurrentOwnerType(), (dest, v) -> dest.getOwner().setType(OwnerConverter.abbreviate((String) v))))
+  .addMapping(src -> src.getCurrentOwnerName() , (dest, v) -> dest.getOwner().setFullName((String) v))
+  .addMapping(src -> src.getCurrentOwnerEmail() , (dest, v) -> dest.getOwner().setEmail((String) v))
+  .addMapping(src -> src.getCurrentOwnerTelephone() , (dest, v) -> dest.getOwner().setTelephone((Long) v))
+  .addMapping(src -> src.getCurrentOwnerAddress() , (dest, v) -> dest.getOwner().setFullAddress((String) v))
+  .addMapping(src -> src.getManufacturingYear() , (dest, v) -> dest.getManufacturingDetail().setMakeYear((Integer) v))
+  .addMappings(mapper -> mapper.using(toLowerCaseConverter).map(src -> src.getBrand() , (dest, v) -> dest.getManufacturingDetail().setBrand((String) v)))
+  .addMappings(mapper -> mapper.using(toLowerCaseConverter).map(src -> src.getModel() , (dest, v) -> dest.getManufacturingDetail().setModel((String) v)))
+  .addMappings(mapper -> mapper.using(toLowerCaseConverter).map(src -> src.getBodyType() , (dest, v) -> dest.getManufacturingDetail().setType((String) v)));
+
+* */

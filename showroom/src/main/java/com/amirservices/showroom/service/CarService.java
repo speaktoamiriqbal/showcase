@@ -4,14 +4,10 @@ import com.amirservices.showroom.dto.CarIncomingDTO;
 import com.amirservices.showroom.dto.CarMapper;
 import com.amirservices.showroom.dto.CarOutgoingDTO;
 import com.amirservices.showroom.model.Car;
-import com.amirservices.showroom.model.ManufacturingDetail;
-import com.amirservices.showroom.model.Owner;
 import com.amirservices.showroom.repository.CarRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
 
 @Slf4j
 @Service
@@ -19,37 +15,55 @@ public class CarService {
     @Autowired
     CarRepository carRepository;
 
-    public Car persistCar(CarIncomingDTO incomingDTO){
+    public CarOutgoingDTO persistCar(CarIncomingDTO incomingDTO){
 
-        Car car = Car.builder()
-                .registrationDate(new Date())
-                .registrationId("LEM1375")
-                .owner(
-                        Owner.builder()
-                                .fullName("Amir Iqbal")
-                                .telephone(1234567L)
-                                .email("ai@abc.com")
-                                .fullAddress("my home address")
-                                .type('P')
-                                .build()
-                )
-                .manufacturingDetail(
-                        ManufacturingDetail.builder()
-                                .brand("toyota")
-                                .model("vitz")
-                                .type("hatchback")
-                                .makeYear(2022)
-                                .build()
-                ).build();
+        Car car = carRepository.findCarsByRegistrationId(incomingDTO.getRegistrationNumber());
+        if (car !=  null){
+            log.warn("Car with same Registration: {} already exist, therefore aborting operation.", car.getRegistrationId());
+            return  CarMapper.INSTANCE.entityToOutgoingDto(car);
+        }
 
-        return carRepository.save(car);
+        car = CarMapper.INSTANCE.incomingDtoToEntity(incomingDTO);
+        car = carRepository.save(car);
 
+        CarOutgoingDTO carOutgoingDTO = CarMapper.INSTANCE.entityToOutgoingDto(car);
+        return carOutgoingDTO;
     }
 
     public CarOutgoingDTO getCarByRegistrationNumber(String registrationId){
         Car car = carRepository.findCarsByRegistrationId(registrationId);
-        return  CarMapper.performEntityToDTOMapping(car);
+        return  null;
 
+    }
+
+    public CarOutgoingDTO updateCar(CarIncomingDTO incomingDTO){
+        Car existingCar = carRepository.findCarsByRegistrationId(incomingDTO.getRegistrationNumber());
+        if (existingCar == null) {
+            log.warn("Car with same Registration: {} does not exist, therefore aborting operation.", existingCar.getRegistrationId());
+            return null;
+        }
+
+        Car requestCar = CarMapper.INSTANCE.incomingDtoToEntity(incomingDTO);
+        requestCar.setId(existingCar.getId());
+        requestCar.getOwner().setId(existingCar.getOwner().getId());
+        requestCar.getManufacturingDetail().setId(existingCar.getManufacturingDetail().getId());
+
+        Car updatedCar = carRepository.save(requestCar);
+        CarOutgoingDTO carOutgoingDTO = CarMapper.INSTANCE.entityToOutgoingDto(updatedCar);
+        return carOutgoingDTO;
+
+    }
+
+    public CarOutgoingDTO removeCar(String registrationId){
+        Car car = carRepository.findCarsByRegistrationId(registrationId);
+        if (car == null){
+            log.warn("Car with same Registration: {} does not exist, therefore aborting operation.", car.getRegistrationId());
+            return null;
+        }
+        carRepository.delete(car);
+
+        CarOutgoingDTO carOutgoingDTO = CarMapper.INSTANCE.entityToOutgoingDto(car);
+        return carOutgoingDTO;
     }
 
 
