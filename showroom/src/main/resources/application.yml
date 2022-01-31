@@ -12,7 +12,12 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false
+
+  security:
+    user:
+      name: user
+      password: 123
 
   h2:
     console:
