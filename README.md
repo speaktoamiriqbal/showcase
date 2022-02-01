@@ -1,5 +1,5 @@
 # Showcase
-demos
+this branch contains my demos handcrafted individually for you.
 
 
 # Important URLs
