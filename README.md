@@ -1,16 +1,15 @@
-# Showcase
-demos
+# Welcome,
+I welcome you to my showcase repository. Feel free to explore the code base :)
 
 
-# Important URLs
-
-*Swagger ui
-http://localhost:8080/swagger-ui/index.html/
+## Feedback / Questions
+Your feedback / questions is highly desirable.
 
 
-*H2 Database
-http://localhost:8080/h2-console/login.do
+## Contributing
+Pull requests are welcome. 
 
-*Api get request
-http://localhost:8080/api/v1/cars/get/{regNumber}
 
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
